@@ -2206,7 +2206,47 @@ function populateFirebaseForm(cfg) {
   if (document.getElementById('fbAppId')) document.getElementById('fbAppId').value = cfg.appId || '';
 }
 
+window.parseAndApplyFirebaseSnippet = function() {
+  const snippet = (document.getElementById('fbRawSnippet') ? document.getElementById('fbRawSnippet').value : '').trim();
+  if (!snippet) {
+    showToast("Please paste your Firebase config snippet first", "danger");
+    return;
+  }
+
+  const extract = (key) => {
+    const regex = new RegExp(`["']?${key}["']?\\s*:\\s*["']([^"']+)["']`, 'i');
+    const match = snippet.match(regex);
+    return match ? match[1].trim() : '';
+  };
+
+  const apiKey = extract('apiKey');
+  const projectId = extract('projectId');
+  const authDomain = extract('authDomain');
+  const storageBucket = extract('storageBucket');
+  const messagingSenderId = extract('messagingSenderId');
+  const appId = extract('appId');
+
+  if (!apiKey && !projectId) {
+    showToast("Could not find apiKey or projectId in the snippet. Please check format.", "danger");
+    return;
+  }
+
+  if (apiKey && document.getElementById('fbApiKey')) document.getElementById('fbApiKey').value = apiKey;
+  if (projectId && document.getElementById('fbProjectId')) document.getElementById('fbProjectId').value = projectId;
+  if (authDomain && document.getElementById('fbAuthDomain')) document.getElementById('fbAuthDomain').value = authDomain;
+  if (storageBucket && document.getElementById('fbStorageBucket')) document.getElementById('fbStorageBucket').value = storageBucket;
+  if (messagingSenderId && document.getElementById('fbMessagingSenderId')) document.getElementById('fbMessagingSenderId').value = messagingSenderId;
+  if (appId && document.getElementById('fbAppId')) document.getElementById('fbAppId').value = appId;
+
+  showToast("Firebase details auto-filled! Click 'Save & Connect' below.", "success");
+};
+
 async function initFirebaseFromStorage() {
+  if (!state.firebaseConfig && window.DEFAULT_FIREBASE_CONFIG && window.DEFAULT_FIREBASE_CONFIG.apiKey && window.DEFAULT_FIREBASE_CONFIG.projectId) {
+    state.firebaseConfig = window.DEFAULT_FIREBASE_CONFIG;
+    populateFirebaseForm(state.firebaseConfig);
+  }
+
   if (!state.firebaseConfig) {
     updateFirebaseUIStatus(false, "Local Storage Mode (Offline Safe)");
     return;

@@ -1374,7 +1374,22 @@
         <!-- SETTINGS TAB 1: Config -->
         <div id="settingsTabConfig" class="settings-tab-pane active">
           <form id="firebaseConfigForm" onsubmit="handleFirebaseConfigSubmit(event)">
-            <p class="section-instruction">Enter your web app configuration from your <strong>Firebase Console → Project Settings → General → Your apps</strong>:</p>
+            <!-- 1-Click Snippet Paste Box -->
+            <div class="quick-paste-box" style="background: rgba(99, 102, 241, 0.08); border: 1px dashed var(--accent-primary); border-radius: 12px; padding: 14px; margin-bottom: 18px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label for="fbRawSnippet" style="font-weight: 700; color: var(--accent-primary); font-size: 0.9rem; margin: 0;">⚡ Fast Setup: Paste Firebase Config Snippet</label>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">JSON or JS Object</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">
+                Copy the code block from Firebase Console & paste it here. It will auto-fill every field instantly!
+              </p>
+              <textarea id="fbRawSnippet" rows="3" style="width: 100%; font-family: monospace; font-size: 0.82rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px;" placeholder='const firebaseConfig = { apiKey: "AIza...", projectId: "...", ... };'></textarea>
+              <div style="margin-top: 8px; display: flex; gap: 8px;">
+                <button type="button" class="btn btn-primary btn-sm" onclick="parseAndApplyFirebaseSnippet()">✨ Auto-Fill Fields</button>
+              </div>
+            </div>
+
+            <p class="section-instruction">Or enter/edit your web app configuration individually:</p>
 
             <div class="form-row">
               <div class="form-group flex-1">
@@ -1512,7 +1527,8 @@
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container"></div>
 
-  <!-- Main JavaScript Logic -->
+  <!-- Firebase Default Config & Main Logic -->
+  <script src="firebase-config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
