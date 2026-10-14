@@ -10,7 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   
-  <!-- Firebase SDK via CDN (Modular v10) -->
+  <!-- Firebase Permanent Config & SDK via CDN (Modular v10) -->
+  <script src="firebase-config.js"></script>
   <script type="module" src="firebase-service.js"></script>
 </head>
 <body>
@@ -1527,8 +1528,7 @@
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container"></div>
 
-  <!-- Firebase Default Config & Main Logic -->
-  <script src="firebase-config.js"></script>
+  <!-- Main JavaScript Logic -->
   <script src="app.js"></script>
 </body>
 </html>

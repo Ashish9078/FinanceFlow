@@ -1,17 +1,13 @@
 // ==========================================================================
-// FinanceFlow - Firebase Configuration
-// ==========================================================================
-// To connect your Google Firebase Firestore database:
-// 1. Open Firebase Console: https://console.firebase.google.com/
-// 2. Select or create your project -> Project Settings -> General -> Your apps -> Web app
-// 3. Paste the configuration object below, or paste it directly in the app's Settings modal.
+// FinanceFlow - Permanent Firebase Configuration
 // ==========================================================================
 
 window.DEFAULT_FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyA0WniXTBT4z0jxe3-7acgdk4KKVjEytIU",
+  authDomain: "financeflow-13dfb.firebaseapp.com",
+  projectId: "financeflow-13dfb",
+  storageBucket: "financeflow-13dfb.firebasestorage.app",
+  messagingSenderId: "887903505706",
+  appId: "1:887903505706:web:01cc968ef454054fbde253",
+  measurementId: "G-M2V37GFZVQ"
 };

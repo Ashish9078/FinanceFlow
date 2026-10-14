@@ -12,9 +12,11 @@ import {
   getDocs,
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 
 let firebaseApp = null;
 let db = null;
+let analytics = null;
 let isConfigured = false;
 
 // Initialize Firebase with given configuration
@@ -36,6 +38,15 @@ export async function initializeFirebaseService(config) {
 
     db = getFirestore(firebaseApp);
     isConfigured = true;
+
+    // Optional Analytics initialization
+    try {
+      if (typeof window !== 'undefined' && await isSupported()) {
+        analytics = getAnalytics(firebaseApp);
+      }
+    } catch (e) {
+      // Analytics might not be supported in some browser environments
+    }
 
     // Test simple probe
     return { success: true, message: "Connected to Firebase Firestore successfully!" };
@@ -127,6 +138,8 @@ export async function batchUploadToCloud(incomes, expenses, lentList, borrowedLi
 
 // Expose on window for app.js interoperability
 window.FirebaseBridge = {
+  initializeAppInstance: () => firebaseApp,
+  getDbInstance: () => db,
   initializeFirebaseService,
   isConnected,
   syncDocToCloud,
@@ -134,3 +147,17 @@ window.FirebaseBridge = {
   fetchCollectionFromCloud,
   batchUploadToCloud
 };
+
+// Dispatch bridge ready event for app.js
+window.dispatchEvent(new CustomEvent('firebaseBridgeReady'));
+
+// Auto-connect immediately if default config is loaded
+if (window.DEFAULT_FIREBASE_CONFIG && window.DEFAULT_FIREBASE_CONFIG.apiKey && window.DEFAULT_FIREBASE_CONFIG.projectId) {
+  initializeFirebaseService(window.DEFAULT_FIREBASE_CONFIG).then(res => {
+    if (res && res.success && typeof window.onFirebaseAutoConnected === 'function') {
+      window.onFirebaseAutoConnected(window.DEFAULT_FIREBASE_CONFIG);
+    }
+  }).catch(e => {
+    console.warn("Auto Firebase connect failed:", e);
+  });
+}

@@ -67,6 +67,9 @@ function loadLocalData() {
     if (rawFbConfig) {
       state.firebaseConfig = JSON.parse(rawFbConfig);
       populateFirebaseForm(state.firebaseConfig);
+    } else if (window.DEFAULT_FIREBASE_CONFIG && window.DEFAULT_FIREBASE_CONFIG.apiKey) {
+      state.firebaseConfig = window.DEFAULT_FIREBASE_CONFIG;
+      populateFirebaseForm(state.firebaseConfig);
     }
   } catch (err) {
     console.error("Error loading local data:", err);
@@ -2252,10 +2255,17 @@ async function initFirebaseFromStorage() {
     return;
   }
 
-  if (window.FirebaseBridge) {
+  // Poll briefly for window.FirebaseBridge if module is still resolving
+  let attempts = 0;
+  while ((!window.FirebaseBridge || typeof window.FirebaseBridge.initializeFirebaseService !== 'function') && attempts < 25) {
+    await new Promise(r => setTimeout(r, 100));
+    attempts++;
+  }
+
+  if (window.FirebaseBridge && typeof window.FirebaseBridge.initializeFirebaseService === 'function') {
     try {
       const res = await window.FirebaseBridge.initializeFirebaseService(state.firebaseConfig);
-      if (res.success) {
+      if (res && res.success) {
         updateFirebaseUIStatus(true, `Firebase Connected: ${state.firebaseConfig.projectId}`);
       } else {
         updateFirebaseUIStatus(false, "Firebase Config Error");
@@ -2264,8 +2274,16 @@ async function initFirebaseFromStorage() {
       console.warn("Firebase auto-connect failed:", e);
       updateFirebaseUIStatus(false, "Firebase Offline / Error");
     }
+  } else {
+    updateFirebaseUIStatus(false, "Local Storage Mode (Offline Safe)");
   }
 }
+
+window.addEventListener('firebaseBridgeReady', () => {
+  if (state.firebaseConfig && window.FirebaseBridge && !window.FirebaseBridge.isConnected()) {
+    initFirebaseFromStorage();
+  }
+});
 
 function updateFirebaseUIStatus(online, text) {
   const statusBtn = document.getElementById('firebaseStatusBtn');
