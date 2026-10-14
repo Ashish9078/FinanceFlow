@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinanceFlow | Smart Personal Finance & Debt Tracker</title>
+  <meta name="description" content="Aesthetic Personal Finance Tracker with Income, Expense, Money Lent, Money Borrowed, Interest Calculator, and Firebase Cloud Sync.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Firebase SDK via CDN (Modular v10) -->
+  <script type="module" src="firebase-service.js"></script>
+</head>
+<body>
+  <!-- Background Glow Accents -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- App Wrapper -->
+  <div class="app-container">
+    
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>FinanceFlow <span class="brand-odia">Ledger</span></h1>
+          <p class="tagline">Personal Finance, Expense & Debt Tracker</p>
+        </div>
+      </div>
+
+      <!-- Quick Status & Action Center -->
+      <div class="nav-actions">
+        <!-- Live USDT Price Pill -->
+        <button id="navUsdtRatePill" class="live-rate-pill" onclick="switchTab('forex')" title="Live USDT/INR Rate - Click to open Converter">
+          <span class="live-indicator-dot"></span>
+          <span class="pill-crypto">USDT</span>
+          <strong id="navUsdtPrice">₹94.92</strong>
+        </button>
+
+        <!-- Firebase Status Pill -->
+        <button id="firebaseStatusBtn" class="status-pill status-offline" title="Click to configure Firebase">
+          <span class="status-dot"></span>
+          <span id="firebaseStatusText">Local Storage Mode</span>
+        </button>
+
+        <!-- Theme Toggle Button -->
+        <button id="themeToggleBtn" class="icon-btn" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+          <svg id="moonIcon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg id="sunIcon" class="hidden" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+
+        <!-- Settings Button -->
+        <button id="openSettingsBtn" class="icon-btn" title="Firebase Settings & Backup">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="dashboard">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <span>Dashboard</span>
+      </button>
+
+      <button class="tab-btn" data-tab="income">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+        <span>Income</span>
+      </button>
+
+      <button class="tab-btn" data-tab="expense">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+        <span>Expenses</span>
+      </button>
+
+      <button class="tab-btn" data-tab="lent">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line></svg>
+        <span>Money Lent</span>
+      </button>
+
+      <button class="tab-btn" data-tab="borrowed">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        <span>Money Borrowed</span>
+      </button>
+
+      <button class="tab-btn" data-tab="calculator">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>
+        <span>Interest Calculator</span>
+      </button>
+
+      <button class="tab-btn" data-tab="forex">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+          <path d="M12 6v2m0 8v2"></path>
+        </svg>
+        <span>USD / USDT</span>
+      </button>
+    </nav>
+
+    <!-- MAIN CONTENT CONTAINERS -->
+    <main class="content-area">
+
+      <!-- ============================================ -->
+      <!-- TAB 1: DASHBOARD OVERVIEW -->
+      <!-- ============================================ -->
+      <section id="tab-dashboard" class="tab-content active">
+        <!-- Hero Stats Cards -->
+        <div class="stats-grid">
+          
+          <!-- Total Income Card -->
+          <div class="stat-card income-card">
+            <div class="stat-header">
+              <span class="stat-badge">Total Received</span>
+              <div class="stat-icon income-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-label">Total Income <span class="odia-sub">All earnings received</span></div>
+              <div class="stat-value" id="dashTotalIncome">₹0</div>
+            </div>
+            <div class="stat-footer">
+              <span class="stat-detail" id="dashIncomeCount">0 recorded entries</span>
+              <button class="mini-action-btn" onclick="openModal('incomeModal')">+ Add Income</button>
+            </div>
+          </div>
+
+          <!-- Total Expense Card -->
+          <div class="stat-card expense-card">
+            <div class="stat-header">
+              <span class="stat-badge expense-badge">Total Spent</span>
+              <div class="stat-icon expense-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-label">Total Expenses <span class="odia-sub">All money spent</span></div>
+              <div class="stat-value text-expense" id="dashTotalExpense">₹0</div>
+            </div>
+            <div class="stat-footer">
+              <span class="stat-detail" id="dashExpenseCount">0 recorded entries</span>
+              <button class="mini-action-btn" onclick="openModal('expenseModal')">+ Add Expense</button>
+            </div>
+          </div>
+
+          <!-- Money Lent (To Receive) Card -->
+          <div class="stat-card lent-card">
+            <div class="stat-header">
+              <span class="stat-badge lent-badge">To Collect</span>
+              <div class="stat-icon lent-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-label">Money Lent (Given) <span class="odia-sub">Pending to receive</span></div>
+              <div class="stat-value text-lent" id="dashLentPending">₹0</div>
+            </div>
+            <div class="stat-footer">
+              <span class="stat-detail"><span id="dashLentTotal">Total Lent: ₹0</span> • <span id="dashLentRecovered" class="text-success">Recovered: ₹0</span></span>
+              <button class="mini-action-btn" onclick="openModal('lentModal')">+ Lend Money</button>
+            </div>
+          </div>
+
+          <!-- Money Borrowed (To Pay) Card -->
+          <div class="stat-card borrowed-card">
+            <div class="stat-header">
+              <span class="stat-badge borrowed-badge">To Repay</span>
+              <div class="stat-icon borrowed-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-label">Money Borrowed <span class="odia-sub">Debt to be repaid</span></div>
+              <div class="stat-value text-borrowed" id="dashBorrowedPending">₹0</div>
+            </div>
+            <div class="stat-footer">
+              <span class="stat-detail"><span id="dashBorrowedTotal">Total Borrowed: ₹0</span> • <span id="dashBorrowedRepaid" class="text-success">Repaid: ₹0</span></span>
+              <button class="mini-action-btn" onclick="openModal('borrowedModal')">+ Borrow Money</button>
+            </div>
+          </div>
+
+          <!-- Net Balance / Cash Health Card -->
+          <div class="stat-card net-card">
+            <div class="stat-header">
+              <span class="stat-badge">Financial Health</span>
+              <div class="stat-icon net-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-label">In-Hand Cash Balance <span class="odia-sub">Income - Expenses</span></div>
+              <div class="stat-value" id="dashInHandCash">₹0</div>
+            </div>
+            <div class="stat-footer">
+              <span class="stat-detail" id="dashNetFormula">Net Position: <strong id="dashNetBalance" class="text-accent">₹0</strong> (including Loans)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Dashboard Charts & Breakdown Row -->
+        <div class="dash-grid-2">
+          
+          <!-- Income / Expense Sources Visual Breakdown -->
+          <div class="dashboard-panel">
+            <div class="panel-header">
+              <div>
+                <h3 id="dashBreakdownTitle">Breakdown Overview</h3>
+                <p class="panel-desc" id="dashBreakdownDesc">Where your money came from or went</p>
+              </div>
+              <div class="panel-tabs-pill">
+                <button class="pill-btn active" id="chartViewIncomeBtn" onclick="setChartView('income')">Income</button>
+                <button class="pill-btn" id="chartViewExpenseBtn" onclick="setChartView('expense')">Expenses</button>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <div class="chart-container">
+                <canvas id="incomeDonutCanvas" width="220" height="220"></canvas>
+                <div class="donut-center-info">
+                  <span class="donut-label" id="donutTotalLabel">Total Income</span>
+                  <span class="donut-value" id="donutTotalText">₹0</span>
+                </div>
+              </div>
+              <div class="chart-legend" id="incomeLegendList">
+                <div class="empty-hint">No transactions recorded yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Loans & Dues Quick Tracker -->
+          <div class="dashboard-panel">
+            <div class="panel-header">
+              <div>
+                <h3>Urgent Dues & Reminders</h3>
+                <p class="panel-desc">Upcoming settlements to collect & repay</p>
+              </div>
+              <div class="panel-tabs-pill">
+                <button class="pill-btn active" id="quickDueFilterAll" onclick="setQuickDueFilter('all')">All</button>
+                <button class="pill-btn" id="quickDueFilterLent" onclick="setQuickDueFilter('lent')">Lent (To Collect)</button>
+                <button class="pill-btn" id="quickDueFilterBorrowed" onclick="setQuickDueFilter('borrowed')">Debt (To Repay)</button>
+              </div>
+            </div>
+            <div class="quick-due-list" id="dashboardQuickDues">
+              <div class="empty-hint">No pending dues found! You're completely settled. 🎉</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Recent Activity Feed -->
+        <div class="dashboard-panel mt-4">
+          <div class="panel-header">
+            <div>
+              <h3>Recent Transactions & Logs</h3>
+              <p class="panel-desc">Latest incomes, expenses, lendings & repayments</p>
+            </div>
+          </div>
+          <div class="recent-table-wrap">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Person / Category</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                  <th>Notes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="recentActivityTbody">
+                <tr><td colspan="6" class="text-center empty-hint">No transactions added yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============================================ -->
+      <!-- TAB 2: INCOME TRACKER -->
+      <!-- ============================================ -->
+      <section id="tab-income" class="tab-content">
+        <div class="section-topbar">
+          <div>
+            <h2>Income Ledger</h2>
+            <p class="section-subtitle">Track every rupee earned and its exact source</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-primary" onclick="openModal('incomeModal')">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>+ Add New Income</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="filter-card">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="incomeSearchInput" placeholder="Search by source, note, or mode..." oninput="renderIncomeTable()">
+          </div>
+          <div class="filter-group">
+            <select id="incomeCategoryFilter" onchange="renderIncomeTable()">
+              <option value="">All Sources</option>
+              <option value="Salary">Salary (Monthly Job)</option>
+              <option value="Business">Business / Shop</option>
+              <option value="Freelance">Freelance / Contract</option>
+              <option value="Rental">House / Rental Income</option>
+              <option value="Agriculture">Agriculture / Farming</option>
+              <option value="Interest">Interest Received</option>
+              <option value="Gift/Bonus">Gift / Festival Bonus</option>
+              <option value="Other">Other Sources</option>
+            </select>
+            <select id="incomeTimeFilter" onchange="renderIncomeTable()">
+              <option value="all">All Time</option>
+              <option value="this-month">This Month</option>
+              <option value="last-month">Last Month</option>
+              <option value="this-year">This Year</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="exportData('income', 'csv')">Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Income Summary Pills -->
+        <div class="pills-summary-bar">
+          <div class="pill-stat">
+            <span class="pill-label">Filtered Total:</span>
+            <span class="pill-val text-success" id="incomeFilteredTotal">₹0</span>
+          </div>
+          <div class="pill-stat">
+            <span class="pill-label">Total Entries:</span>
+            <span class="pill-val" id="incomeFilteredCount">0</span>
+          </div>
+        </div>
+
+        <!-- Income Table -->
+        <div class="table-container">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Source</th>
+                <th>Amount (₹)</th>
+                <th>Payment Mode</th>
+                <th>Description / Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="incomeTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================ -->
+      <!-- TAB 3: EXPENSE TRACKER -->
+      <!-- ============================================ -->
+      <section id="tab-expense" class="tab-content">
+        <div class="section-topbar">
+          <div>
+            <h2>Expense Ledger</h2>
+            <p class="section-subtitle">Track every rupee spent and where it went</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-expense-action" onclick="openModal('expenseModal')">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>+ Add New Expense</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="filter-card">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="expenseSearchInput" placeholder="Search by category, note, or mode..." oninput="renderExpenseTable()">
+          </div>
+          <div class="filter-group">
+            <select id="expenseCategoryFilter" onchange="renderExpenseTable()">
+              <option value="">All Categories</option>
+              <option value="Food & Groceries">Food & Groceries</option>
+              <option value="Utilities & Bills">Utilities & Bills (Electricity/Recharge)</option>
+              <option value="Fuel & Transport">Fuel & Transport</option>
+              <option value="Shopping">Shopping & Clothes</option>
+              <option value="Health & Medical">Health & Medical</option>
+              <option value="Rent">House Rent</option>
+              <option value="Education">Education & Courses</option>
+              <option value="Entertainment">Entertainment & Dining</option>
+              <option value="Other">Other Expenses</option>
+            </select>
+            <select id="expenseTimeFilter" onchange="renderExpenseTable()">
+              <option value="all">All Time</option>
+              <option value="this-month">This Month</option>
+              <option value="last-month">Last Month</option>
+              <option value="this-year">This Year</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="exportData('expense', 'csv')">Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Expense Summary Pills -->
+        <div class="pills-summary-bar">
+          <div class="pill-stat">
+            <span class="pill-label">Filtered Expense:</span>
+            <span class="pill-val text-expense" id="expenseFilteredTotal">₹0</span>
+          </div>
+          <div class="pill-stat">
+            <span class="pill-label">Total Entries:</span>
+            <span class="pill-val" id="expenseFilteredCount">0</span>
+          </div>
+        </div>
+
+        <!-- Expense Table -->
+        <div class="table-container">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Amount (₹)</th>
+                <th>Payment Mode</th>
+                <th>Description / Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expenseTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================ -->
+      <!-- TAB 4: MONEY LENT -->
+      <!-- ============================================ -->
+      <section id="tab-lent" class="tab-content">
+        <div class="section-topbar">
+          <div>
+            <h2>Money Lent</h2>
+            <p class="section-subtitle">Money given to others that you need to collect back</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-primary btn-lent-action" onclick="openModal('lentModal')">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>+ Record Money Lent</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="filter-card">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="lentSearchInput" placeholder="Search by borrower name, phone, or note..." oninput="renderLentTable()">
+          </div>
+          <div class="filter-group">
+            <select id="lentStatusFilter" onchange="renderLentTable()">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending (To Collect)</option>
+              <option value="partial">Partially Paid</option>
+              <option value="settled">Fully Settled</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="exportData('lent', 'csv')">Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Summary Bar -->
+        <div class="pills-summary-bar">
+          <div class="pill-stat">
+            <span class="pill-label">Total Lent:</span>
+            <span class="pill-val" id="lentTotalGiven">₹0</span>
+          </div>
+          <div class="pill-stat">
+            <span class="pill-label">Total Recovered:</span>
+            <span class="pill-val text-success" id="lentTotalRecovered">₹0</span>
+          </div>
+          <div class="pill-stat">
+            <span class="pill-label">Pending to Collect:</span>
+            <span class="pill-val text-danger" id="lentStillToCollect">₹0</span>
+          </div>
+        </div>
+
+        <!-- Lent Cards / Grid -->
+        <div class="cards-grid" id="lentCardsGrid">
+          <!-- Dynamically populated with aesthetic cards -->
+        </div>
+      </section>
+
+      <!-- ============================================ -->
+      <!-- TAB 5: MONEY BORROWED (DEBT) -->
+      <!-- ============================================ -->
+      <section id="tab-borrowed" class="tab-content">
+        <div class="section-topbar">
+          <div>
+            <h2>Money Borrowed (Debt)</h2>
+            <p class="section-subtitle">Money you borrowed from others that you need to repay</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-danger-action" onclick="openModal('borrowedModal')">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>+ Record Money Borrowed</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="filter-card">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="borrowedSearchInput" placeholder="Search by lender name, phone, or note..." oninput="renderBorrowedTable()">
+          </div>
+          <div class="filter-group">
+            <select id="borrowedStatusFilter" onchange="renderBorrowedTable()">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending (To Repay)</option>
+              <option value="partial">Partially Repaid</option>
+              <option value="settled">Fully Settled</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="exportData('borrowed', 'csv')">Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Summary Bar -->
+        <div class="pills-summary-bar">
+          <div class="pill-stat">
+            <span class="pill-label">Total Borrowed:</span>
+            <span class="pill-val" id="borrowedTotalSum">₹0</span>
+          </div>
+          <div class="pill-stat">
+            <span class="pill-label">Total Repaid:</span>
+            <span class="pill-val text-success" id="borrowedTotalRepaid">₹0</span>
+          </div>
+          <div class="pill-stat">
+            <span class="pill-label">Remaining Debt:</span>
+            <span class="pill-val text-danger" id="borrowedStillToPay">₹0</span>
+          </div>
+        </div>
+
+        <!-- Borrowed Cards / Grid -->
+        <div class="cards-grid" id="borrowedCardsGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- ============================================ -->
+      <!-- TAB 6: INTEREST CALCULATOR -->
+      <!-- ============================================ -->
+      <section id="tab-calculator" class="tab-content">
+        <div class="section-topbar">
+          <div>
+            <h2>Interest & EMI Calculator</h2>
+            <p class="section-subtitle">Accurate monthly loan interest, simple interest, compound interest & bank EMI</p>
+          </div>
+        </div>
+
+        <div class="calculator-layout">
+          <!-- Left side: Mode selection and Input fields -->
+          <div class="calc-card-inputs">
+            
+            <!-- Calc Mode Nav -->
+            <div class="calc-mode-selector">
+              <button class="calc-mode-btn active" data-calcmode="desi">
+                <span>🌾 Monthly Loan Rate</span>
+                <small>₹ per ₹100 / month (Local Monthly Rate)</small>
+              </button>
+              <button class="calc-mode-btn" data-calcmode="si">
+                <span>📈 Simple Interest (SI)</span>
+                <small>P × R × T / 100</small>
+              </button>
+              <button class="calc-mode-btn" data-calcmode="ci">
+                <span>🔄 Compound Interest (CI)</span>
+                <small>Annual / Quarterly / Monthly</small>
+              </button>
+              <button class="calc-mode-btn" data-calcmode="emi">
+                <span>🏦 Bank Loan EMI</span>
+                <small>Installment & Loan Amortization</small>
+              </button>
+            </div>
+
+            <!-- Form Inputs -->
+            <div class="calc-form">
+              <!-- Principal -->
+              <div class="form-group">
+                <label for="calcPrincipal">Principal Amount (₹) <span class="required">*</span></label>
+                <div class="input-with-prefix">
+                  <span class="prefix">₹</span>
+                  <input type="number" id="calcPrincipal" placeholder="e.g. 50000" value="50000" min="1" oninput="calculateInterest()">
+                </div>
+              </div>
+
+              <!-- Rate Fields (swapped based on mode) -->
+              <div class="form-group" id="rateDesiGroup">
+                <label for="calcDesiRate">Monthly Interest Rate (%) <span class="required">*</span></label>
+                <div class="input-with-prefix">
+                  <input type="number" id="calcDesiRate" placeholder="e.g. 2 or 3" value="2" step="0.1" min="0" oninput="calculateInterest()">
+                  <span class="suffix">% per month (₹2 per ₹100)</span>
+                </div>
+                <div class="helper-text">Equivalent to <strong id="desiAnnualEq">24%</strong> per annum</div>
+              </div>
+
+              <div class="form-group hidden" id="rateAnnualGroup">
+                <label for="calcAnnualRate">Annual Interest Rate (% p.a.) <span class="required">*</span></label>
+                <div class="input-with-prefix">
+                  <input type="number" id="calcAnnualRate" placeholder="e.g. 12" value="12" step="0.1" min="0" oninput="calculateInterest()">
+                  <span class="suffix">% per annum</span>
+                </div>
+              </div>
+
+              <!-- Compound Frequency (only for CI) -->
+              <div class="form-group hidden" id="ciFreqGroup">
+                <label for="calcCiFreq">Compounding Frequency</label>
+                <select id="calcCiFreq" onchange="calculateInterest()">
+                  <option value="12">Monthly</option>
+                  <option value="4">Quarterly</option>
+                  <option value="2">Half-Yearly</option>
+                  <option value="1" selected>Yearly</option>
+                </select>
+              </div>
+
+              <!-- Time Period -->
+              <div class="time-period-row">
+                <div class="form-group flex-1">
+                  <label for="calcTimeMonths">Tenure in Months</label>
+                  <input type="number" id="calcTimeMonths" placeholder="Months" value="6" min="0" oninput="calculateInterest()">
+                </div>
+                <div class="form-group flex-1" id="daysGroup">
+                  <label for="calcTimeDays">Extra Days</label>
+                  <input type="number" id="calcTimeDays" placeholder="Days" value="0" min="0" max="31" oninput="calculateInterest()">
+                </div>
+              </div>
+
+              <!-- Action buttons -->
+              <div class="calc-actions">
+                <button class="btn btn-outline" onclick="resetCalculator()">Reset</button>
+                <button class="btn btn-primary" onclick="applyCalcToLoan('lent')">Add to Money Lent</button>
+                <button class="btn btn-outline-danger" onclick="applyCalcToLoan('borrowed')">Add to Money Borrowed</button>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Right side: Calculation Results Card -->
+          <div class="calc-card-results">
+            <div class="results-header">
+              <h3>Calculation Summary <span class="result-badge" id="calcBadgeTitle">Monthly Rate</span></h3>
+              <p>Real-time calculation breakdown</p>
+            </div>
+
+            <div class="results-big-display">
+              <div class="res-item main-res">
+                <span class="res-label">Total Payable Amount</span>
+                <span class="res-val-big" id="resTotalPayable">₹56,000</span>
+              </div>
+            </div>
+
+            <div class="results-breakdown-list">
+              <div class="res-row">
+                <span class="res-row-label">Principal Amount</span>
+                <span class="res-row-value" id="resPrincipal">₹50,000</span>
+              </div>
+              <div class="res-row">
+                <span class="res-row-label">Total Interest</span>
+                <span class="res-row-value text-accent" id="resTotalInterest">₹6,000</span>
+              </div>
+              <div class="res-row" id="resMonthlyRow">
+                <span class="res-row-label">Per Month Interest</span>
+                <span class="res-row-value" id="resPerMonthInterest">₹1,000</span>
+              </div>
+              <div class="res-row" id="resDailyRow">
+                <span class="res-row-label">Per Day Interest</span>
+                <span class="res-row-value" id="resPerDayInterest">₹33.33</span>
+              </div>
+              <div class="res-row hidden" id="resEmiRow">
+                <span class="res-row-label">Monthly EMI</span>
+                <span class="res-row-value text-success" id="resEmiAmount">₹0</span>
+              </div>
+            </div>
+
+            <!-- Visual Bar -->
+            <div class="visual-split">
+              <div class="split-bar-track">
+                <div class="split-bar-principal" id="splitPrincipalBar" style="width: 89%;"></div>
+                <div class="split-bar-interest" id="splitInterestBar" style="width: 11%;"></div>
+              </div>
+              <div class="split-bar-legend">
+                <span><span class="dot-p"></span> Principal (<span id="splitPrincipalPct">89%</span>)</span>
+                <span><span class="dot-i"></span> Interest (<span id="splitInterestPct">11%</span>)</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================ -->
+      <!-- TAB 7: USD / USDT REAL-TIME CONVERTER & HUB -->
+      <!-- ============================================ -->
+      <section id="tab-forex" class="tab-content">
+        <div class="section-topbar">
+          <div>
+            <h2>USD & USDT Real-Time Converter</h2>
+            <p class="section-subtitle">Live real-time crypto & dollar conversion to INR with automatic ledger recording</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-outline" id="refreshForexBtn" onclick="fetchLiveUsdtRate(true)">
+              <svg id="refreshForexSpinner" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 4v6h-6M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Refresh Rate</span>
+            </button>
+            <span class="text-xs text-muted" id="forexLastUpdated" style="align-self: center;">Live</span>
+          </div>
+        </div>
+
+        <!-- Live 3-Cards Market Rate Status Grid -->
+        <div class="forex-rates-grid">
+          <!-- Card 1: Live USDT / INR -->
+          <div class="forex-rate-card forex-card-primary" onclick="setForexMode('usdt')" style="cursor: pointer;">
+            <div class="forex-rate-header">
+              <span class="forex-badge forex-badge-green"><span class="live-indicator-dot" style="display:inline-block; margin-right:4px;"></span> LIVE CRYPTO</span>
+              <span class="forex-change-tag text-success" id="usdtChangeTag">+0.15% (24h)</span>
+            </div>
+            <div>
+              <div class="forex-price-row">
+                <span class="forex-big-price" id="cardUsdtPrice">₹94.92</span>
+                <span class="text-muted text-sm">/ 1 USDT</span>
+              </div>
+              <p class="forex-card-desc">Tether (USDT) Real-Time Market Rate • Powered by CoinGecko API</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Official USD / INR -->
+          <div class="forex-rate-card" onclick="setForexMode('forex')" style="cursor: pointer;">
+            <div class="forex-rate-header">
+              <span class="forex-badge forex-badge-blue">CENTRAL FOREX</span>
+              <span class="text-muted text-xs">Interbank Rate</span>
+            </div>
+            <div>
+              <div class="forex-price-row">
+                <span class="forex-big-price" id="cardUsdPrice">₹88.65</span>
+                <span class="text-muted text-sm">/ 1 USD</span>
+              </div>
+              <p class="forex-card-desc">Official United States Dollar Interbank Foreign Exchange Rate</p>
+            </div>
+          </div>
+
+          <!-- Card 3: Active Conversion Rate Selected -->
+          <div class="forex-rate-card">
+            <div class="forex-rate-header">
+              <span class="forex-badge forex-badge-purple" id="activeRateBadge">ACTIVE CONVERTER</span>
+              <button class="btn-link text-xs" onclick="setForexMode('custom')">Edit Custom Rate</button>
+            </div>
+            <div>
+              <div class="forex-price-row">
+                <span class="forex-big-price text-accent" id="activeRateDisplay">₹94.92</span>
+                <span class="text-muted text-sm">Applied</span>
+              </div>
+              <p class="forex-card-desc" id="activeRateLabel">Using Live USDT Market Rate</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-Column Workspace -->
+        <div class="forex-workspace">
+          
+          <!-- Column 1: Live Interactive Converter & Push-to-Ledger -->
+          <div class="forex-main-panel">
+            <h3 class="forex-panel-title">Instant Converter</h3>
+            <p class="forex-panel-sub">Enter Dollar or Rupee amount — converts in real-time as you type</p>
+
+            <!-- Mode Selector Pills -->
+            <div class="forex-mode-nav">
+              <button class="forex-mode-tab active" id="tabModeUsdt" onclick="setForexMode('usdt')">⚡ USDT (Crypto Live)</button>
+              <button class="forex-mode-tab" id="tabModeForex" onclick="setForexMode('forex')">🌐 USD (Official Forex)</button>
+              <button class="forex-mode-tab" id="tabModeCustom" onclick="setForexMode('custom')">✏️ Custom / P2P Rate</button>
+            </div>
+
+            <!-- Custom Rate Input Row (Shown when Custom is selected) -->
+            <div class="custom-rate-box hidden" id="customRateRow">
+              <label for="customRateInput">Custom Rate (₹ per $):</label>
+              <input type="number" id="customRateInput" placeholder="e.g. 91.50" step="0.01" style="max-width: 130px;" oninput="onCustomRateInput()">
+              <small class="text-muted">Useful for specific Binance P2P / cash deal prices</small>
+            </div>
+
+            <!-- Box 1: USD / USDT Input -->
+            <div class="converter-currency-box">
+              <div class="currency-box-top">
+                <span class="currency-name-tag">
+                  <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 6v2m0 8v2"></path></svg>
+                  <span>USD / USDT Amount</span>
+                </span>
+                <span class="text-xs text-muted" id="usdBoxRateHint">Rate: ₹94.92 / $</span>
+              </div>
+              <div class="currency-input-row">
+                <span class="prefix-symbol">$</span>
+                <input type="number" id="forexUsdInput" class="forex-big-input" placeholder="100" value="100" step="any" min="0" oninput="onForexUsdChange()">
+              </div>
+              <!-- Quick Dollar Amount Chips -->
+              <div class="quick-dollar-chips">
+                <button type="button" class="currency-chip" onclick="addForexAmount(10)">+$10</button>
+                <button type="button" class="currency-chip" onclick="addForexAmount(50)">+$50</button>
+                <button type="button" class="currency-chip" onclick="addForexAmount(100)">+$100</button>
+                <button type="button" class="currency-chip" onclick="addForexAmount(500)">+$500</button>
+                <button type="button" class="currency-chip" onclick="addForexAmount(1000)">+$1,000</button>
+                <button type="button" class="currency-chip" onclick="setForexExactAmount(5000)">$5,000</button>
+                <button type="button" class="currency-chip currency-chip-clear" onclick="setForexExactAmount(0)">Clear</button>
+              </div>
+            </div>
+
+            <!-- Swap Divider Button -->
+            <div class="converter-swap-row">
+              <button class="swap-btn" title="Convert bidirectional" onclick="invertForexValues()">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline><line x1="12" y1="19" x2="12" y2="5"></line></svg>
+              </button>
+            </div>
+
+            <!-- Box 2: Converted INR Input -->
+            <div class="converter-currency-box">
+              <div class="currency-box-top">
+                <span class="currency-name-tag">
+                  <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M6 3h12M6 8h12M6 13l8.5 8M6 13h3a4.5 4.5 0 0 0 0-9"></path></svg>
+                  <span>Converted INR (Indian Rupee)</span>
+                </span>
+                <span class="text-xs text-success font-bold" id="inrLiveTag">Real-time ₹</span>
+              </div>
+              <div class="currency-input-row">
+                <span class="prefix-symbol">₹</span>
+                <input type="number" id="forexInrInput" class="forex-big-input text-success" placeholder="9,492" step="any" min="0" oninput="onForexInrChange()">
+              </div>
+            </div>
+
+            <!-- Fee / TDS Deductible Option -->
+            <div class="forex-options-bar">
+              <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                <input type="checkbox" id="forexTdsCheckbox" onchange="recalculateForex()" checked>
+                <span>Deduct 1% TDS / Platform Gas Fee</span>
+              </label>
+              <span class="text-muted" id="forexNetInrHint">Net In-Hand: <strong>₹9,397.08</strong></span>
+            </div>
+
+            <!-- 1-Click Action Buttons to Ledger -->
+            <div class="forex-actions-label">One-Click Transfer to Ledger</div>
+            <div class="forex-actions-grid">
+              <button class="btn-forex-action btn-forex-income" onclick="transferForexToLedger('income')">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                <span>+ Add as Income</span>
+              </button>
+
+              <button class="btn-forex-action btn-forex-expense" onclick="transferForexToLedger('expense')">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                <span>+ Add as Expense</span>
+              </button>
+
+              <button class="btn-forex-action btn-forex-lent" onclick="transferForexToLedger('lent')">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline></svg>
+                <span>+ Lend in INR</span>
+              </button>
+
+              <button class="btn-forex-action btn-forex-borrowed" onclick="transferForexToLedger('borrowed')">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline></svg>
+                <span>+ Borrow in INR</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Column 2: Breakdown & Quick Reference Table -->
+          <div class="forex-side-panel">
+            
+            <!-- Breakdown Card -->
+            <div class="forex-summary-card">
+              <h4 style="margin-bottom: 0.8rem; font-family: var(--font-heading);">Exchange Breakdown</h4>
+              <div class="summary-row-item">
+                <span class="text-muted">Dollar / USDT Amount:</span>
+                <strong id="summaryUsdAmount">$100.00</strong>
+              </div>
+              <div class="summary-row-item">
+                <span class="text-muted">Current Exchange Rate:</span>
+                <span id="summaryRateUsed">₹94.92 per $1</span>
+              </div>
+              <div class="summary-row-item">
+                <span class="text-muted">Gross Value (INR):</span>
+                <span id="summaryGrossInr">₹9,492.00</span>
+              </div>
+              <div class="summary-row-item">
+                <span class="text-muted">TDS / Platform Fee (1%):</span>
+                <span class="text-danger" id="summaryFeeInr">-₹94.92</span>
+              </div>
+              <div class="summary-row-item summary-row-total">
+                <span>Net Received in INR:</span>
+                <strong class="text-success" style="font-size: 1.25rem;" id="summaryNetInr">₹9,397.08</strong>
+              </div>
+            </div>
+
+            <!-- Quick Reference Cheat Sheet Table -->
+            <div class="forex-summary-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <h4 style="font-family: var(--font-heading);">Standard Value Table</h4>
+                <span class="text-xs text-muted" id="cheatSheetRateNote">1 USDT = ₹94.92</span>
+              </div>
+              <table class="forex-cheat-table">
+                <thead>
+                  <tr>
+                    <th>USD / USDT ($)</th>
+                    <th>Gross (₹)</th>
+                    <th>Net (1% TDS)</th>
+                  </tr>
+                </thead>
+                <tbody id="forexCheatTbody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 1: ADD / EDIT INCOME -->
+  <!-- ============================================ -->
+  <div class="modal-backdrop hidden" id="incomeModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="incomeModalTitle">Add Income</h3>
+          <p class="modal-sub">Record money earned and where it came from</p>
+        </div>
+        <button class="modal-close" onclick="closeModal('incomeModal')">&times;</button>
+      </div>
+      <form id="incomeForm" onsubmit="handleIncomeSubmit(event)">
+        <input type="hidden" id="incomeEditId">
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label for="incomeAmount">Amount (₹) <span class="required">*</span></label>
+              <button type="button" class="btn-usd-toggle" onclick="toggleUsdHelper('income')">💵 Enter in USD/USDT</button>
+            </div>
+            <div class="input-with-prefix">
+              <span class="prefix">₹</span>
+              <input type="number" id="incomeAmount" placeholder="e.g. 25000" min="1" step="any" required>
+            </div>
+            <div class="usd-helper-box hidden" id="incomeUsdHelperBox">
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="number" id="incomeUsdInput" placeholder="Enter USD / USDT" step="any" min="0" oninput="convertModalUsdToInr('income')">
+              </div>
+              <span class="rate-hint" id="incomeUsdHint">⚡ Live Auto-Convert @ ₹94.92 / USDT</span>
+            </div>
+          </div>
+          <div class="form-group flex-1">
+            <label for="incomeDate">Date Received <span class="required">*</span></label>
+            <input type="date" id="incomeDate" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="incomeCategory">Source Category <span class="required">*</span></label>
+            <select id="incomeCategory" required onchange="handleIncomeCategoryChange()">
+              <option value="Salary">Salary (Monthly Job)</option>
+              <option value="Business">Business / Shop</option>
+              <option value="Freelance">Freelance / Gig Work</option>
+              <option value="Rental">House / Room Rent</option>
+              <option value="Agriculture">Agriculture / Farming</option>
+              <option value="Interest">Interest Received</option>
+              <option value="Gift/Bonus">Gift / Festival Bonus</option>
+              <option value="Custom">Custom Source...</option>
+            </select>
+          </div>
+          <div class="form-group flex-1 hidden" id="incomeCustomSourceGroup">
+            <label for="incomeCustomSource">Specify Source Name <span class="required">*</span></label>
+            <input type="text" id="incomeCustomSource" placeholder="e.g. Old Bike Sold, Tuition...">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="incomePaymentMode">Payment Method</label>
+          <div class="radio-pill-group">
+            <label><input type="radio" name="incomeMode" value="UPI" checked> <span>UPI / PhonePe / GPay</span></label>
+            <label><input type="radio" name="incomeMode" value="Cash"> <span>Cash</span></label>
+            <label><input type="radio" name="incomeMode" value="Bank"> <span>Bank Transfer</span></label>
+            <label><input type="radio" name="incomeMode" value="Cheque"> <span>Cheque</span></label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="incomeNotes">Description / Notes</label>
+          <textarea id="incomeNotes" rows="2" placeholder="Optional details (e.g. October monthly salary from ABC Corp)"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('incomeModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="incomeSubmitBtn">Save Income</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL: ADD / EDIT EXPENSE -->
+  <!-- ============================================ -->
+  <div class="modal-backdrop hidden" id="expenseModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="expenseModalTitle">Add Expense</h3>
+          <p class="modal-sub">Record money spent and what it was for</p>
+        </div>
+        <button class="modal-close" onclick="closeModal('expenseModal')">&times;</button>
+      </div>
+      <form id="expenseForm" onsubmit="handleExpenseSubmit(event)">
+        <input type="hidden" id="expenseEditId">
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label for="expenseAmount">Amount (₹) <span class="required">*</span></label>
+              <button type="button" class="btn-usd-toggle" onclick="toggleUsdHelper('expense')">💵 Enter in USD/USDT</button>
+            </div>
+            <div class="input-with-prefix">
+              <span class="prefix">₹</span>
+              <input type="number" id="expenseAmount" placeholder="e.g. 1500" min="1" step="any" required>
+            </div>
+            <div class="usd-helper-box hidden" id="expenseUsdHelperBox">
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="number" id="expenseUsdInput" placeholder="Enter USD / USDT" step="any" min="0" oninput="convertModalUsdToInr('expense')">
+              </div>
+              <span class="rate-hint" id="expenseUsdHint">⚡ Live Auto-Convert @ ₹94.92 / USDT</span>
+            </div>
+          </div>
+          <div class="form-group flex-1">
+            <label for="expenseDate">Date Spent <span class="required">*</span></label>
+            <input type="date" id="expenseDate" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="expenseCategory">Expense Category <span class="required">*</span></label>
+            <select id="expenseCategory" required onchange="handleExpenseCategoryChange()">
+              <option value="Food & Groceries">Food & Groceries</option>
+              <option value="Utilities & Bills">Utilities & Bills (Electricity/Recharge)</option>
+              <option value="Fuel & Transport">Fuel & Transport</option>
+              <option value="Shopping">Shopping & Clothes</option>
+              <option value="Health & Medical">Health & Medical</option>
+              <option value="Rent">House Rent</option>
+              <option value="Education">Education & Courses</option>
+              <option value="Entertainment">Entertainment & Dining</option>
+              <option value="Custom">Custom Category...</option>
+            </select>
+          </div>
+          <div class="form-group flex-1 hidden" id="expenseCustomCategoryGroup">
+            <label for="expenseCustomCategory">Specify Category Name <span class="required">*</span></label>
+            <input type="text" id="expenseCustomCategory" placeholder="e.g. Bike Repair, Party...">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="expensePaymentMode">Payment Method</label>
+          <div class="radio-pill-group">
+            <label><input type="radio" name="expenseMode" value="UPI" checked> <span>UPI / PhonePe / GPay</span></label>
+            <label><input type="radio" name="expenseMode" value="Cash"> <span>Cash</span></label>
+            <label><input type="radio" name="expenseMode" value="Bank"> <span>Bank Transfer</span></label>
+            <label><input type="radio" name="expenseMode" value="Card"> <span>Debit / Credit Card</span></label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="expenseNotes">Description / Notes</label>
+          <textarea id="expenseNotes" rows="2" placeholder="Optional details (e.g. Weekly vegetables & groceries)"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('expenseModal')">Cancel</button>
+          <button type="submit" class="btn btn-expense-action" id="expenseSubmitBtn">Save Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 2: ADD / EDIT MONEY LENT -->
+  <!-- ============================================ -->
+  <div class="modal-backdrop hidden" id="lentModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="lentModalTitle">Record Money Lent</h3>
+          <p class="modal-sub">Track money given to others that you need to get back</p>
+        </div>
+        <button class="modal-close" onclick="closeModal('lentModal')">&times;</button>
+      </div>
+      <form id="lentForm" onsubmit="handleLentSubmit(event)">
+        <input type="hidden" id="lentEditId">
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="lentPersonName">Borrower Name <span class="required">*</span></label>
+            <input type="text" id="lentPersonName" placeholder="e.g. Prakash Swain, Rakesh..." required>
+          </div>
+          <div class="form-group flex-1">
+            <label for="lentPhone">Phone Number</label>
+            <input type="tel" id="lentPhone" placeholder="10-digit number for reminders">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label for="lentAmount">Amount Lent (₹) <span class="required">*</span></label>
+              <button type="button" class="btn-usd-toggle" onclick="toggleUsdHelper('lent')">💵 Enter in USD/USDT</button>
+            </div>
+            <div class="input-with-prefix">
+              <span class="prefix">₹</span>
+              <input type="number" id="lentAmount" placeholder="e.g. 10000" min="1" step="any" required>
+            </div>
+            <div class="usd-helper-box hidden" id="lentUsdHelperBox">
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="number" id="lentUsdInput" placeholder="Enter USD / USDT" step="any" min="0" oninput="convertModalUsdToInr('lent')">
+              </div>
+              <span class="rate-hint" id="lentUsdHint">⚡ Live Auto-Convert @ ₹94.92 / USDT</span>
+            </div>
+          </div>
+          <div class="form-group flex-1">
+            <label for="lentDateGiven">Date Given <span class="required">*</span></label>
+            <input type="date" id="lentDateGiven" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="lentDueDate">Expected Return Date</label>
+            <input type="date" id="lentDueDate">
+          </div>
+          <div class="form-group flex-1">
+            <label for="lentInterestRate">Interest Rate (Optional)</label>
+            <div class="input-with-prefix">
+              <input type="number" id="lentInterestRate" placeholder="0 if interest-free" min="0" step="0.1" value="0">
+              <span class="suffix">% / month</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lentReason">Reason / Purpose / Notes</label>
+          <input type="text" id="lentReason" placeholder="e.g. Urgent medical need, festival expenses...">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('lentModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="lentSubmitBtn">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 3: ADD / EDIT MONEY BORROWED -->
+  <!-- ============================================ -->
+  <div class="modal-backdrop hidden" id="borrowedModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="borrowedModalTitle">Record Money Borrowed</h3>
+          <p class="modal-sub">Track money you took and need to repay</p>
+        </div>
+        <button class="modal-close" onclick="closeModal('borrowedModal')">&times;</button>
+      </div>
+      <form id="borrowedForm" onsubmit="handleBorrowedSubmit(event)">
+        <input type="hidden" id="borrowedEditId">
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="borrowedPersonName">Lender Name <span class="required">*</span></label>
+            <input type="text" id="borrowedPersonName" placeholder="e.g. Deepak, Manas, Friend..." required>
+          </div>
+          <div class="form-group flex-1">
+            <label for="borrowedPhone">Phone Number</label>
+            <input type="tel" id="borrowedPhone" placeholder="Lender's contact number">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label for="borrowedAmount">Amount Borrowed (₹) <span class="required">*</span></label>
+              <button type="button" class="btn-usd-toggle" onclick="toggleUsdHelper('borrowed')">💵 Enter in USD/USDT</button>
+            </div>
+            <div class="input-with-prefix">
+              <span class="prefix">₹</span>
+              <input type="number" id="borrowedAmount" placeholder="e.g. 15000" min="1" step="any" required>
+            </div>
+            <div class="usd-helper-box hidden" id="borrowedUsdHelperBox">
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="number" id="borrowedUsdInput" placeholder="Enter USD / USDT" step="any" min="0" oninput="convertModalUsdToInr('borrowed')">
+              </div>
+              <span class="rate-hint" id="borrowedUsdHint">⚡ Live Auto-Convert @ ₹94.92 / USDT</span>
+            </div>
+          </div>
+          <div class="form-group flex-1">
+            <label for="borrowedDateTaken">Date Taken <span class="required">*</span></label>
+            <input type="date" id="borrowedDateTaken" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="borrowedDueDate">Repayment Due Date</label>
+            <input type="date" id="borrowedDueDate">
+          </div>
+          <div class="form-group flex-1">
+            <label for="borrowedInterestRate">Interest Rate (Optional)</label>
+            <div class="input-with-prefix">
+              <input type="number" id="borrowedInterestRate" placeholder="0 if interest-free" min="0" step="0.1" value="0">
+              <span class="suffix">% / month</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="borrowedReason">Reason / Notes</label>
+          <input type="text" id="borrowedReason" placeholder="e.g. Home repair, shopping, emergency...">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('borrowedModal')">Cancel</button>
+          <button type="submit" class="btn btn-danger" id="borrowedSubmitBtn">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 4: RECORD REPAYMENT / SETTLEMENT -->
+  <!-- ============================================ -->
+  <div class="modal-backdrop hidden" id="repaymentModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="repayModalTitle">Record Payment / Settlement</h3>
+          <p class="modal-sub" id="repayModalSubtitle">Update remaining balance</p>
+        </div>
+        <button class="modal-close" onclick="closeModal('repaymentModal')">&times;</button>
+      </div>
+
+      <div class="repay-summary-box">
+        <div class="repay-sum-item">
+          <span>Total Original:</span>
+          <strong id="repayTotalOriginal">₹0</strong>
+        </div>
+        <div class="repay-sum-item">
+          <span>Already Paid:</span>
+          <strong class="text-success" id="repayAlreadyPaid">₹0</strong>
+        </div>
+        <div class="repay-sum-item">
+          <span>Remaining Balance:</span>
+          <strong class="text-danger" id="repayRemainingBalance">₹0</strong>
+        </div>
+      </div>
+
+      <form id="repaymentForm" onsubmit="handleRepaymentSubmit(event)">
+        <input type="hidden" id="repayTargetType"> <!-- 'lent' or 'borrowed' -->
+        <input type="hidden" id="repayTargetId">
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="repayAmount">Payment Amount (₹) <span class="required">*</span></label>
+            <div class="input-with-prefix">
+              <span class="prefix">₹</span>
+              <input type="number" id="repayAmount" min="1" step="any" placeholder="Enter amount" required>
+            </div>
+            <button type="button" class="btn-link mt-1" onclick="fillFullRemainingAmount()">Pay Full Remaining Balance</button>
+          </div>
+          <div class="form-group flex-1">
+            <label for="repayDate">Payment Date <span class="required">*</span></label>
+            <input type="date" id="repayDate" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="repayPaymentMode">Payment Method</label>
+          <div class="radio-pill-group">
+            <label><input type="radio" name="repayMode" value="UPI" checked> <span>UPI</span></label>
+            <label><input type="radio" name="repayMode" value="Cash"> <span>Cash</span></label>
+            <label><input type="radio" name="repayMode" value="Bank"> <span>Bank Transfer</span></label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="repayNote">Note / Remarks</label>
+          <input type="text" id="repayNote" placeholder="e.g. Paid installment via PhonePe">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('repaymentModal')">Close</button>
+          <button type="submit" class="btn btn-success">Save Payment</button>
+        </div>
+      </form>
+
+      <!-- History of partial payments -->
+      <div class="repay-history-wrap">
+        <h4>Past Payments History</h4>
+        <div id="repayHistoryList" class="repay-history-list">
+          <div class="empty-hint">No past payments logged yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 5: FIREBASE SETTINGS & CLOUD SYNC -->
+  <!-- ============================================ -->
+  <div class="modal-backdrop hidden" id="settingsModal">
+    <div class="modal-card max-w-650">
+      <div class="modal-header">
+        <div>
+          <h3>Firebase Cloud Database</h3>
+          <p class="modal-sub">Sync all your finance data safely to Google Firebase Firestore in real-time</p>
+        </div>
+        <button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
+      </div>
+
+      <div class="settings-body">
+        
+        <!-- Live Status Bar -->
+        <div class="firebase-status-banner" id="firebaseConfigBanner">
+          <div class="status-indicator-badge" id="firebaseBannerBadge">
+            <span class="status-dot"></span>
+            <span id="firebaseBannerText">Local Storage Mode (Offline Safe)</span>
+          </div>
+          <p class="banner-hint" id="firebaseBannerHint">Your data is currently saved securely inside your browser storage. Connect your Firebase project below to enable cloud backup & live multi-device access!</p>
+        </div>
+
+        <div class="tabs-settings-header">
+          <button class="tab-settings-btn active" onclick="switchSettingsTab('config')">Firebase Config</button>
+          <button class="tab-settings-btn" onclick="switchSettingsTab('backup')">Local Backup & Restore</button>
+          <button class="tab-settings-btn" onclick="switchSettingsTab('guide')">How to Setup Free Firebase</button>
+        </div>
+
+        <!-- SETTINGS TAB 1: Config -->
+        <div id="settingsTabConfig" class="settings-tab-pane active">
+          <form id="firebaseConfigForm" onsubmit="handleFirebaseConfigSubmit(event)">
+            <p class="section-instruction">Enter your web app configuration from your <strong>Firebase Console → Project Settings → General → Your apps</strong>:</p>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="fbApiKey">API Key <span class="required">*</span></label>
+                <input type="text" id="fbApiKey" placeholder="AIzaSy...">
+              </div>
+              <div class="form-group flex-1">
+                <label for="fbProjectId">Project ID <span class="required">*</span></label>
+                <input type="text" id="fbProjectId" placeholder="my-finance-tracker-123">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="fbAuthDomain">Auth Domain</label>
+                <input type="text" id="fbAuthDomain" placeholder="my-finance.firebaseapp.com">
+              </div>
+              <div class="form-group flex-1">
+                <label for="fbStorageBucket">Storage Bucket</label>
+                <input type="text" id="fbStorageBucket" placeholder="my-finance.appspot.com">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="fbMessagingSenderId">Messaging Sender ID</label>
+                <input type="text" id="fbMessagingSenderId" placeholder="1029384756">
+              </div>
+              <div class="form-group flex-1">
+                <label for="fbAppId">App ID <span class="required">*</span></label>
+                <input type="text" id="fbAppId" placeholder="1:1029384756:web:abcd...">
+              </div>
+            </div>
+
+            <div class="settings-actions-row">
+              <button type="button" class="btn btn-outline" onclick="testFirebaseConnection()">Test Connection</button>
+              <button type="submit" class="btn btn-primary">Save & Connect to Firebase</button>
+            </div>
+          </form>
+
+          <!-- Sync Buttons -->
+          <div class="sync-actions-box mt-3">
+            <h4>Cloud Sync Actions</h4>
+            <div class="sync-btns-row">
+              <button class="btn btn-outline btn-sm" onclick="syncLocalToFirebase()">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                Upload Local Data to Firebase
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="fetchFromFirebase()">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download from Firebase
+              </button>
+              <button class="btn btn-outline-danger btn-sm" onclick="disconnectFirebase()">Disconnect Firebase</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SETTINGS TAB 2: Backup & Restore -->
+        <div id="settingsTabBackup" class="settings-tab-pane hidden">
+          <p class="section-instruction">Download an instant backup of your entire ledger, or import previously saved data.</p>
+          <div class="backup-grid">
+            <div class="backup-card">
+              <h4>Download Backup</h4>
+              <p>Saves all Incomes, Expenses, Money Lent, and Money Borrowed as a secure JSON file.</p>
+              <button class="btn btn-primary btn-sm mt-2" onclick="downloadJsonBackup()">Download Backup JSON</button>
+            </div>
+
+            <div class="backup-card">
+              <h4>Restore from Backup</h4>
+              <p>Upload a JSON backup file to restore all your records.</p>
+              <input type="file" id="restoreFileInput" accept=".json" class="mt-2" onchange="handleRestoreBackup(event)">
+            </div>
+          </div>
+        </div>
+
+        <!-- SETTINGS TAB 3: Easy Firebase Guide -->
+        <div id="settingsTabGuide" class="settings-tab-pane hidden">
+          <div class="guide-steps">
+            <div class="step-item">
+              <span class="step-num">1</span>
+              <div>
+                <strong>Go to Firebase Console:</strong>
+                <p>Open <a href="https://console.firebase.google.com" target="_blank" rel="noopener">console.firebase.google.com</a> and click "Create a project" (free forever).</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <span class="step-num">2</span>
+              <div>
+                <strong>Create Cloud Firestore:</strong>
+                <p>In left sidebar, click <strong>Build → Firestore Database</strong>. Click "Create Database" and choose "Start in test mode" to read/write data easily.</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <span class="step-num">3</span>
+              <div>
+                <strong>Add a Web App:</strong>
+                <p>Click the Web icon <code>&lt;/&gt;</code> in Project Overview, register your app name (e.g. "DhanaKhaata"), and copy the <code>firebaseConfig</code> values into the form above!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('settingsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar (Active on Mobile Phones <= 768px) -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Mobile Navigation">
+    <button class="mobile-nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      <span>Home</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="income" onclick="switchTab('income')">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+      <span>Income</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="expense" onclick="switchTab('expense')">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+      <span>Expenses</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="lent" onclick="switchTab('lent')">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line></svg>
+      <span>Loans</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="forex" onclick="switchTab('forex')">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 6v2m0 8v2"></path></svg>
+      <span>USDT</span>
+    </button>
+  </nav>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Main JavaScript Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
